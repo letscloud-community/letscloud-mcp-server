@@ -1,119 +1,166 @@
-from typing import List, Optional
-import logging
-from letscloud import LetsCloud
-from letscloud.domains import (
-    SSHKey,
-    SSHKeyCreateRequest,
-    Instance,
-    CreateInstanceRequest,
-    Plan
-)
+"""
+LetsCloud API Client
+~~~~~~~~~~~~~~~~~~~
 
-logger = logging.getLogger(__name__)
+Cliente para interação com a API da LetsCloud.
+"""
+
+import requests
+from typing import Dict, List, Optional, Any
+from .config import settings
 
 class LetsCloudClient:
-    """Client wrapper for LetsCloud SDK"""
-    
-    def __init__(self):
-        pass
+    """
+    Cliente para interação com a API da LetsCloud.
+    """
 
-    def _get_client(self, letscloud_token: str) -> LetsCloud:
-        """Get a LetsCloud client instance with the provided token"""
-        return LetsCloud(letscloud_token)
+    def __init__(self, api_token: str):
+        """
+        Inicializa o cliente com o token de API.
 
-    # SSH Key Operations
-    def create_ssh_key(self, letscloud_token: str, title: str, key: str) -> SSHKey:
-        """Create a new SSH key"""
-        try:
-            client = self._get_client(letscloud_token)
-            request = SSHKeyCreateRequest(
-                title=title,
-                key=key
-            )
-            return client.NewSSHKey(request.title, request.key)
-        except Exception as e:
-            logger.error(f"Failed to create SSH key: {str(e)}")
-            raise
+        Args:
+            api_token: Token de API da LetsCloud
+        """
+        self.api_token = api_token
+        self.base_url = "https://api.letscloud.io/v1"
+        self.headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json"
+        }
 
-    def list_ssh_keys(self, letscloud_token: str) -> List[SSHKey]:
-        """List all SSH keys"""
-        try:
-            client = self._get_client(letscloud_token)
-            return client.SSHKeys()
-        except Exception as e:
-            logger.error(f"Failed to list SSH keys: {str(e)}")
-            raise
+    def _make_request(self, method: str, endpoint: str, **kwargs) -> Dict[str, Any]:
+        """
+        Faz uma requisição para a API da LetsCloud.
 
-    def get_ssh_key(self, letscloud_token: str, key_id: str) -> SSHKey:
-        """Get a specific SSH key"""
-        try:
-            client = self._get_client(letscloud_token)
-            return client.SSHKey(key_id)
-        except Exception as e:
-            logger.error(f"Failed to get SSH key: {str(e)}")
-            raise
+        Args:
+            method: Método HTTP (GET, POST, PUT, DELETE)
+            endpoint: Endpoint da API
+            **kwargs: Argumentos adicionais para a requisição
 
-    def delete_ssh_key(self, letscloud_token: str, key_id: str) -> None:
-        """Delete an SSH key"""
-        try:
-            client = self._get_client(letscloud_token)
-            client.DeleteSSHKey(key_id)
-        except Exception as e:
-            logger.error(f"Failed to delete SSH key: {str(e)}")
-            raise
+        Returns:
+            Resposta da API em formato de dicionário
+        """
+        url = f"{self.base_url}/{endpoint}"
+        response = requests.request(method, url, headers=self.headers, **kwargs)
+        response.raise_for_status()
+        return response.json()
 
-    # Instance Operations
-    def create_instance(self, letscloud_token: str, request: CreateInstanceRequest) -> None:
-        """Create a new instance"""
-        try:
-            client = self._get_client(letscloud_token)
-            client.CreateInstance(request)
-        except Exception as e:
-            logger.error(f"Failed to create instance: {str(e)}")
-            raise
+    def list_servers(self) -> List[Dict[str, Any]]:
+        """
+        Lista todos os servidores.
 
-    def list_instances(self, letscloud_token: str) -> List[Instance]:
-        """List all instances"""
-        try:
-            client = self._get_client(letscloud_token)
-            return client.Instances()
-        except Exception as e:
-            logger.error(f"Failed to list instances: {str(e)}")
-            raise
+        Returns:
+            Lista de servidores
+        """
+        return self._make_request("GET", "servers")
 
-    def get_instance(self, letscloud_token: str, instance_id: str) -> Instance:
-        """Get a specific instance"""
-        try:
-            client = self._get_client(letscloud_token)
-            return client.Instance(instance_id)
-        except Exception as e:
-            logger.error(f"Failed to get instance: {str(e)}")
-            raise
+    def get_server(self, server_id: int) -> Dict[str, Any]:
+        """
+        Obtém detalhes de um servidor específico.
 
-    def delete_instance(self, letscloud_token: str, instance_id: str) -> None:
-        """Delete an instance"""
-        try:
-            client = self._get_client(letscloud_token)
-            client.DeleteInstance(instance_id)
-        except Exception as e:
-            logger.error(f"Failed to delete instance: {str(e)}")
-            raise
+        Args:
+            server_id: ID do servidor
 
-    def reset_instance_password(self, letscloud_token: str, instance_id: str, password: str) -> None:
-        """Reset instance password"""
-        try:
-            client = self._get_client(letscloud_token)
-            client.ResetPasswordInstance(instance_id, password)
-        except Exception as e:
-            logger.error(f"Failed to reset instance password: {str(e)}")
-            raise
+        Returns:
+            Detalhes do servidor
+        """
+        return self._make_request("GET", f"servers/{server_id}")
 
-    # Location Plans
-    def get_location_plans(self, letscloud_token: str, location: str) -> List[Plan]:
-        """Get available plans for a location"""
-        try:
-            client = self._get_client(letscloud_token)
-            return client.LocationPlans(location)
-        except Exception as e:
-            logger.error(f"Failed to get location plans: {str(e)}")
-            raise 
+    def create_server(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Cria um novo servidor.
+
+        Args:
+            data: Dados do servidor
+
+        Returns:
+            Detalhes do servidor criado
+        """
+        return self._make_request("POST", "servers", json=data)
+
+    def delete_server(self, server_id: int) -> None:
+        """
+        Deleta um servidor.
+
+        Args:
+            server_id: ID do servidor
+        """
+        self._make_request("DELETE", f"servers/{server_id}")
+
+    def list_ssh_keys(self) -> List[Dict[str, Any]]:
+        """
+        Lista todas as chaves SSH.
+
+        Returns:
+            Lista de chaves SSH
+        """
+        return self._make_request("GET", "ssh-keys")
+
+    def create_ssh_key(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Cria uma nova chave SSH.
+
+        Args:
+            data: Dados da chave SSH
+
+        Returns:
+            Detalhes da chave SSH criada
+        """
+        return self._make_request("POST", "ssh-keys", json=data)
+
+    def delete_ssh_key(self, key_id: int) -> None:
+        """
+        Deleta uma chave SSH.
+
+        Args:
+            key_id: ID da chave SSH
+        """
+        self._make_request("DELETE", f"ssh-keys/{key_id}")
+
+    def create_snapshot(self, server_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Cria um snapshot de um servidor.
+
+        Args:
+            server_id: ID do servidor
+            data: Dados do snapshot
+
+        Returns:
+            Detalhes do snapshot criado
+        """
+        return self._make_request("POST", f"servers/{server_id}/snapshots", json=data)
+
+    def list_snapshots(self, server_id: int) -> List[Dict[str, Any]]:
+        """
+        Lista todos os snapshots de um servidor.
+
+        Args:
+            server_id: ID do servidor
+
+        Returns:
+            Lista de snapshots
+        """
+        return self._make_request("GET", f"servers/{server_id}/snapshots")
+
+    def delete_snapshot(self, server_id: int, snapshot_id: int) -> None:
+        """
+        Deleta um snapshot.
+
+        Args:
+            server_id: ID do servidor
+            snapshot_id: ID do snapshot
+        """
+        self._make_request("DELETE", f"servers/{server_id}/snapshots/{snapshot_id}")
+
+    def restore_snapshot(self, server_id: int, snapshot_id: int) -> Dict[str, Any]:
+        """
+        Restaura um servidor a partir de um snapshot.
+
+        Args:
+            server_id: ID do servidor
+            snapshot_id: ID do snapshot
+
+        Returns:
+            Detalhes da operação de restauração
+        """
+        return self._make_request("POST", f"servers/{server_id}/snapshots/{snapshot_id}/restore") 

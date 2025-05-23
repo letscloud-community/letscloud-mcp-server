@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+*.db
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# Test/coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.coverage
+
+# MacOS
+.DS_Store 
