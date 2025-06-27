@@ -1,0 +1,188 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "letscloud-mcp-server"
+version = "1.0.0"
+description = "Manage LetsCloud infrastructure through natural AI conversations - MCP Server with English & Portuguese support"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "LetsCloud MCP Team", email = "support@letscloud.io"}
+]
+maintainers = [
+    {name = "LetsCloud MCP Team", email = "support@letscloud.io"}
+]
+keywords = [
+    "mcp", 
+    "model-context-protocol", 
+    "letscloud", 
+    "infrastructure", 
+    "cloud-management", 
+    "api", 
+    "server",
+    "ai",
+    "claude-desktop",
+    "portuguese",
+    "english",
+    "bilingual",
+    "natural-language",
+    "conversation"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+    "Topic :: Communications :: Chat",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Natural Language :: English",
+    "Natural Language :: Portuguese (Brazilian)",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.1.0",
+    "pydantic>=2.10.3",
+    "httpx>=0.28.1",
+    "asyncio-mqtt>=0.16.2",
+    "requests>=2.32.3",
+    "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "black>=24.0.0",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+]
+testing = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+]
+hosting = [
+    "uvicorn>=0.32.1",
+    "fastapi>=0.115.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/letscloud/letscloud-mcp-server"
+Documentation = "https://github.com/letscloud/letscloud-mcp-server#readme"
+"Documentation (English)" = "https://github.com/letscloud/letscloud-mcp-server/blob/main/examples/README_EN.md"
+"Documentation (Português)" = "https://github.com/letscloud/letscloud-mcp-server/blob/main/examples/README.md"
+Repository = "https://github.com/letscloud/letscloud-mcp-server"
+"Bug Reports" = "https://github.com/letscloud/letscloud-mcp-server/issues"
+LetsCloud = "https://letscloud.io"
+"MCP Protocol" = "https://modelcontextprotocol.io"
+"Claude Desktop" = "https://claude.ai/download"
+
+[project.scripts]
+letscloud-mcp-server = "letscloud_mcp_server.server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "mcp.*",
+    "asyncio_mqtt.*",
+]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".venv",
+    ".tox",
+] 

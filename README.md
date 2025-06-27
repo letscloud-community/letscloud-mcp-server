@@ -1,172 +1,208 @@
-# LetsCloud MCP API
+# LetsCloud MCP Server
 
-API para gerenciamento de servidores LetsCloud.
+🤖 **Manage your cloud infrastructure through natural AI conversations**
 
-## Descrição
-Esta aplicação fornece uma API para gerenciar servidores, snapshots e chaves SSH na LetsCloud, servindo como um proxy seguro para operações automatizadas.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that lets you manage your LetsCloud servers by simply talking to AI assistants like Claude Desktop, without any technical knowledge required.
 
-## Instalação
+## 🌍 Multi-Language Support
 
+- **🇺🇸 [English README](README.md)** (This document)
+- **🇧🇷 [Portuguese README](README_PT.md)** - Versão completa em português
+- **📖 [Language Support Guide](LANGUAGE_SUPPORT.md)** - Complete bilingual documentation
+
+## 🎯 What You Can Do
+
+Talk naturally to AI and get things done:
+
+- **"Create a server for my online store"** → AI creates it instantly
+- **"My website is slow, help fix it"** → AI analyzes and optimizes  
+- **"Backup all my servers before the update"** → AI handles everything
+- **"My site crashed! Help!"** → AI diagnoses and recovers automatically
+
+No programming. No technical commands. Just natural conversation in **English** or **Portuguese**.
+
+## 🚀 Quick Start
+
+### 1. Get Your LetsCloud API Key
+- Visit [LetsCloud Dashboard](https://my.letscloud.io/profile/client-api)
+- Enable and copy API key 
+
+### 2. Install & Configure Claude Desktop
+- Download [Claude Desktop](https://claude.ai/download)
+- Add this to your configuration file:
+
+```json
+{
+  "mcpServers": {
+    "letscloud": {
+      "command": "python",
+      "args": ["-m", "letscloud_mcp_server"],
+      "env": {
+        "LETSCLOUD_API_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+### 3. Install the MCP Server
 ```bash
-git clone https://github.com/seu-usuario/letscloud-mcp.git
-cd letscloud-mcp
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+pip install git+https://github.com/letscloud/letscloud-mcp-server.git
 ```
 
-## Configuração
-
-A aplicação requer algumas variáveis de ambiente para funcionar corretamente. As credenciais sensíveis serão gerenciadas automaticamente pelo servidor MCP.
-
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
-
-```env
-# Server settings
-SERVER_HOST=0.0.0.0
-SERVER_PORT=8000
-DEBUG=true
-
-# Security settings
-JWT_SECRET=<fornecido pela IA>
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Database settings
-DATABASE_URL=sqlite:///./app.db
-
-# Redis settings
-REDIS_URL=redis://localhost:6379/0
+### 4. Start Talking!
+Open Claude Desktop and say:
+```
+"Hi! Show me my current servers and help me manage my infrastructure."
 ```
 
-> **Nota**: As credenciais sensíveis serão gerenciadas automaticamente pelo servidor MCP. Não é necessário configurá-las manualmente.
+## 📚 Complete Guides
 
-## Integração com o Servidor MCP
+### 🇺🇸 English Documentation
+- **[User Guide](examples/README_EN.md)** - Everything you need to get started
+- **[How to Use with AI](examples/HOW_TO_USE_WITH_AI_EN.md)** - Complete usage guide
+- **[Configuration Guide](examples/AI_CONFIGURATION_EN.md)** - Step-by-step setup
+- **[Conversation Examples](examples/CONVERSATION_EXAMPLES_EN.md)** - Real scenarios and dialogues
 
-Para integrar esta API ao servidor MCP, siga os seguintes passos:
+### 🇧🇷 Documentação em Português  
+- **[Guia do Usuário](examples/README.md)** - Tudo que você precisa para começar
+- **[Como Usar com IA](examples/COMO_USAR_COM_IA.md)** - Guia completo de uso
+- **[Configuração de IA](examples/CONFIGURACAO_IA.md)** - Configuração passo a passo
+- **[Exemplos de Conversas](examples/CONVERSAS_EXEMPLOS.md)** - Cenários reais e diálogos
 
-1. **Preparação do Ambiente**
-   ```bash
-   # No diretório do servidor MCP
-   cd ../mcp-server
-   
-   # Criar diretório para a API
-   mkdir -p apps/letscloud-mcp
-   
-   # Copiar os arquivos da API
-   cp -r ../letscloud-mcp/* apps/letscloud-mcp/
-   ```
+## 🛠️ What You Can Manage
 
-2. **Configuração do Nginx**
-   Adicione a seguinte configuração ao arquivo `nginx/conf.d/letscloud-mcp.conf`:
-   ```nginx
-   location /api/letscloud/ {
-       proxy_pass http://localhost:8000/;
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
-       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-       proxy_set_header X-Forwarded-Proto $scheme;
-   }
-   ```
+### Server Operations
+- Create, start, stop, reboot, delete servers
+- List servers and get detailed information
+- Scale up/down server resources
+- Multi-region deployments
 
-3. **Configuração do Supervisor**
-   Crie um arquivo `supervisor/conf.d/letscloud-mcp.conf`:
-   ```ini
-   [program:letscloud-mcp]
-   command=/path/to/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
-   directory=/path/to/mcp-server/apps/letscloud-mcp
-   user=www-data
-   autostart=true
-   autorestart=true
-   stderr_logfile=/var/log/supervisor/letscloud-mcp.err.log
-   stdout_logfile=/var/log/supervisor/letscloud-mcp.out.log
-   environment=PYTHONPATH="/path/to/mcp-server/apps/letscloud-mcp"
-   ```
+### Backup & Recovery
+- Create snapshots for data protection
+- Automatic backup scheduling
+- Quick restore from snapshots
+- Emergency recovery procedures
 
-4. **Reiniciar Serviços**
-   ```bash
-   # Recarregar configuração do Nginx
-   sudo nginx -t && sudo systemctl reload nginx
-   
-   # Recarregar Supervisor
-   sudo supervisorctl reread
-   sudo supervisorctl update
-   sudo supervisorctl start letscloud-mcp
-   ```
+### Security & Access
+- SSH key management
+- SSL certificate handling
+- Access control configuration
+- Security monitoring
 
-5. **Verificação**
-   - Acesse `https://seu-mcp-server/api/letscloud/docs` para verificar se a API está funcionando
-   - Verifique os logs em `/var/log/supervisor/letscloud-mcp.*.log`
+### Cost Optimization
+- Resource usage analysis
+- Cost reduction recommendations
+- Automatic scaling policies
+- Usage monitoring and alerts
 
-## Executando a aplicação
+## 💬 Example Conversations
 
-```bash
-uvicorn app.main:app --reload
+### Beginner User
+```
+You: "I need a website for my small business"
+AI: "I'll help you create a professional website. What type of business?"
+You: "It's a bakery, I want to show my products and take orders"
+AI: "Perfect! Creating a bakery website with online ordering..."
+✅ WordPress site created with e-commerce
+✅ Payment processing configured  
+✅ SSL security enabled
+✅ Ready in 10 minutes - $35/month
 ```
 
-Acesse a documentação interativa em: [http://localhost:8000/docs](http://localhost:8000/docs)
-
-## Executando os testes
-
-```bash
-./run_tests.sh
+### Emergency Response
+```
+You: "HELP! My website is down during our biggest sale!"
+AI: "�� Emergency detected! Investigating immediately..."
+🔍 Diagnosed: Server overload from high traffic
+⚡ Creating emergency server with 3x capacity
+✅ Site restored in 8 minutes with auto-scaling
 ```
 
-## Estrutura do Projeto
+## 🌟 Why Choose LetsCloud MCP Server?
 
-- `app/` - Código principal da aplicação
-- `tests/` - Testes automatizados
-- `requirements.txt` - Dependências
-- `run_tests.sh` - Script para rodar os testes
+✅ **Zero Technical Knowledge Required** - Just talk naturally  
+✅ **Works in English & Portuguese** - Native language support  
+✅ **Instant Emergency Response** - AI handles crises automatically  
+✅ **Cost Optimization** - AI finds savings opportunities  
+✅ **24/7 Monitoring** - Proactive problem prevention  
+✅ **Scalable Architecture** - Grows with your business  
+✅ **Enterprise Security** - Bank-level data protection  
 
-## Licença
+## 🤖 Supported AI Platforms
 
-MIT
+- **✅ Claude Desktop** (Recommended - Best experience)
+- **✅ Cline** (VS Code extension)  
+- **✅ Zed Editor**
+- **⏳ ChatGPT** (Coming soon to GPT Store)
+- **✅ Any MCP-compatible client**
 
-## Requisitos
+## 🔧 Installation
 
+### Prerequisites
 - Python 3.11+
-- FastAPI
-- Uvicorn
-- Outras dependências listadas em `requirements.txt`
+- LetsCloud account with API access
+- MCP-compatible AI client
 
-## Uso
-
-Para usar esta API, você precisará:
-
-1. Ter acesso a um servidor MCP (fornecido pela LetsCloud)
-2. Configurar as variáveis de ambiente necessárias
-
-### Exemplo de Uso
-
-```python
-from letscloud_mcp import LetsCloudMCP
-
-# Inicializar o cliente
-mcp = LetsCloudMCP(
-    server_url="https://mcp.letscloud.io"
-)
-
-# Usar os métodos da API
-response = mcp.list_servers()
+### Option A: Install from GitHub (Recommended)
+```bash
+pip install git+https://github.com/letscloud/letscloud-mcp-server.git
 ```
 
-## Documentação da API
+### Option B: Install from Source  
+```bash
+git clone https://github.com/letscloud/letscloud-mcp-server.git
+cd letscloud-mcp-server
+pip install -e .
+```
 
-A documentação completa da API está disponível em:
-- Swagger UI: `https://mcp.letscloud.io/docs`
-- ReDoc: `https://mcp.letscloud.io/redoc`
+### Option C: Install from PyPI (Coming Soon)
+```bash
+# Will be available after publishing to PyPI
+pip install letscloud-mcp-server
+```
 
-## Contribuindo
+## 🌍 Language Support
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Crie um Pull Request
+This project provides complete documentation and support in:
+- **English** - For international users
+- **Português** - Para usuários brasileiros
 
-## Suporte
+The AI assistants will automatically detect your language and respond appropriately, adapting:
+- Currency (USD vs BRL)
+- Payment methods (Credit cards vs PIX)
+- Legal compliance (GDPR vs LGPD)
+- Business contexts (Global vs Brazilian markets)
 
-Para suporte, entre em contato com:
-- Email: support@letscloud.io
-- Documentação: https://letscloud.io/help 
+**🇧🇷 Para usuários brasileiros:** Acesse a [documentação completa em português](README_PT.md).
+
+## 📞 Support & Community
+
+- **📖 Documentation**: Complete guides in `/examples/`
+- **🐛 Bug Reports**: [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
+- **💬 Questions**: [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
+- **🌐 LetsCloud Support**: [support@letscloud.io](mailto:support@letscloud.io)
+- **🌍 Multi-language**: English and Portuguese support available
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Model Context Protocol](https://modelcontextprotocol.io) by Anthropic
+- [LetsCloud](https://letscloud.io) for the infrastructure API
+- The open source community for inspiration and support
+
+---
+
+**Ready to revolutionize how you manage infrastructure?**
+
+🚀 **[Start with our Quick Setup Guide →](examples/README_EN.md)**  
+🇧🇷 **[Comece com nosso Guia Rápido →](examples/README.md)**
+
+*Manage servers like a pro, without being one.* 
