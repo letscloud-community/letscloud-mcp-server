@@ -1,6 +1,6 @@
 #!/bin/bash
-# 🚀 LetsCloud MCP Server - Script de Deploy Automatizado
-# Este script automatiza a instalação completa do servidor na VM
+# 🚀 LetsCloud MCP Server - Script de Deploy Automatizado (Root Version)
+# Este script automatiza a instalação completa do servidor na VM como root
 
 set -e  # Exit on any error
 
@@ -29,100 +29,28 @@ error() {
 echo -e "${BLUE}"
 cat << "EOF"
 ╔══════════════════════════════════════════════════════════╗
-║              LetsCloud MCP Server Deploy                ║
-║                 Script de Instalação Automática         ║
+║          LetsCloud MCP Server Deploy (Root)             ║
+║             Script de Instalação como Root               ║
 ╚══════════════════════════════════════════════════════════╝
 EOF
 echo -e "${NC}"
 
 # Verificar se está rodando como root
-if [[ $EUID -eq 0 ]]; then
-    warn "⚠️  Detectado que você está executando como root!"
-    echo "Por segurança, é recomendado executar como usuário não-root."
-    echo
-    read -p "🤔 Deseja criar automaticamente um usuário 'mcpserver' e continuar? (s/n): " create_user
-    
-    if [[ "$create_user" =~ ^[SsYy]$ ]]; then
-        log "👤 Criando usuário 'mcpserver'..."
-        
-        # Verificar se usuário já existe
-        if id "mcpserver" &>/dev/null; then
-            log "👤 Usuário 'mcpserver' já existe!"
-        else
-            # Criar usuário
-            useradd -m -s /bin/bash mcpserver
-            log "✅ Usuário 'mcpserver' criado com sucesso!"
-        fi
-        
-        # Adicionar ao grupo sudo se não estiver
-        usermod -aG sudo mcpserver
-        
-        # Configurar sudo sem senha para este script
-        echo "mcpserver ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/mcpserver-temp
-        
-        log "🔄 Mudando para usuário 'mcpserver' e continuando..."
-        
-        # Primeiro solicitar configurações como root
-        echo
-        log "📋 Configuração inicial (como root)..."
-        echo
-        
-        read -p "🔑 Token da API LetsCloud: " LETSCLOUD_API_TOKEN
-        while [[ -z "$LETSCLOUD_API_TOKEN" ]]; do
-            read -p "🔑 Token da API LetsCloud (obrigatório): " LETSCLOUD_API_TOKEN
-        done
-        
-        read -p "🔐 Chave da API HTTP (deixe vazio para gerar): " MCP_API_KEY
-        read -p "🌐 Porta do servidor [8000]: " SERVER_PORT
-        SERVER_PORT=${SERVER_PORT:-8000}
-        read -p "🏠 Domínio (opcional, deixe vazio para usar IP): " DOMAIN
-        
-        # Gerar chave API se não fornecida
-        if [[ -z "$MCP_API_KEY" ]]; then
-            MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
-            log "🔐 Chave API gerada automaticamente: $MCP_API_KEY"
-        fi
-        
-        # Salvar configurações em arquivo temporário
-        cat > /tmp/mcp_config.env << EOF
-LETSCLOUD_API_TOKEN="$LETSCLOUD_API_TOKEN"
-MCP_API_KEY="$MCP_API_KEY"
-SERVER_PORT="$SERVER_PORT"
-DOMAIN="$DOMAIN"
-SKIP_CONFIG=true
-EOF
-        
-        # Copiar o script original para /tmp
-        cp "$0" /tmp/deploy_as_user.sh
-        chmod +x /tmp/deploy_as_user.sh
-        
-        # Executar como mcpserver carregando as configurações
-        exec sudo -u mcpserver -i bash -c "source /tmp/mcp_config.env && /tmp/deploy_as_user.sh"
-        
-        # Esta linha nunca será alcançada devido ao exec
-        exit 0
-    else
-        echo
-        warn "Para executar manualmente como usuário não-root:"
-        echo "1. Criar usuário: useradd -m -s /bin/bash mcpserver"
-        echo "2. Adicionar ao sudo: usermod -aG sudo mcpserver"  
-        echo "3. Mudar usuário: su - mcpserver"
-        echo "4. Executar script: curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh | bash"
-        exit 1
-    fi
+if [[ $EUID -ne 0 ]]; then
+    error "❌ Este script deve ser executado como root (sudo ./deploy_pt.sh)"
 fi
 
-# Carregar configurações se disponíveis (para execução via smart deploy)
-if [[ -f "/tmp/mcp_config.env" && "$SKIP_CONFIG" != "true" ]]; then
-    log "📥 Carregando configurações do smart deploy..."
-    source /tmp/mcp_config.env
-    log "✅ Configurações carregadas com sucesso"
-fi
+log "🔧 Executando deploy como root..."
 
-# Verificar se sudo está disponível
-if ! command -v sudo &> /dev/null; then
-    error "sudo não está instalado. Instale o sudo primeiro."
-fi
+# Definir diretórios de trabalho
+WORK_DIR="/opt/letscloud-mcp"
+ENV_FILE="$WORK_DIR/.env"
+PROJECT_DIR="$WORK_DIR/letscloud-mcp-server"
+
+log "📁 Diretório de trabalho: $WORK_DIR"
+
+# Criar diretórios necessários
+mkdir -p "$WORK_DIR"/{logs,scripts,backups}
 
 # Função para solicitar input do usuário
 get_input() {
@@ -191,7 +119,7 @@ log "🚀 Iniciando instalação..."
 
 # Atualizar sistema
 log "📦 Atualizando sistema..."
-sudo apt update && sudo apt upgrade -y
+apt update && apt upgrade -y
 
 # Instalar dependências básicas
 log "🔧 Instalando dependências..."
@@ -203,7 +131,7 @@ if [[ -z "$PYTHON_VERSION" ]]; then
 fi
 log "🐍 Python $PYTHON_VERSION detectado"
 
-sudo apt install -y \
+apt install -y \
     python3 \
     python3-pip \
     python3-venv \
@@ -219,29 +147,13 @@ sudo apt install -y \
     ufw \
     fail2ban
 
-# Criar usuário mcpserver se não existir
-if ! id "mcpserver" &>/dev/null; then
-    log "👤 Criando usuário mcpserver..."
-    sudo useradd -m -s /bin/bash mcpserver
-    sudo usermod -aG sudo mcpserver
-else
-    log "👤 Usuário mcpserver já existe"
-fi
-
-# Configurar diretório home
-MCP_HOME="/home/mcpserver"
-PROJECT_DIR="$MCP_HOME/letscloud-mcp-server"
-
-# Criar diretórios necessários
-sudo -u mcpserver mkdir -p $MCP_HOME/{logs,scripts,backups}
-
 # Clonar ou atualizar repositório
 if [[ -d "$PROJECT_DIR" ]]; then
     log "🔄 Atualizando repositório existente..."
-    sudo -u mcpserver git -C "$PROJECT_DIR" pull
+    git -C "$PROJECT_DIR" pull
 else
     log "📥 Clonando repositório..."
-    sudo -u mcpserver git clone https://github.com/letscloud-community/letscloud-mcp-server.git "$PROJECT_DIR"
+    git clone https://github.com/letscloud-community/letscloud-mcp-server.git "$PROJECT_DIR"
 fi
 
 # Configurar ambiente Python
@@ -250,18 +162,20 @@ cd "$PROJECT_DIR"
 
 # Criar ambiente virtual
 if [[ ! -d "venv" ]]; then
-    sudo -u mcpserver python3 -m venv venv
+    python3 -m venv venv
 fi
 
 # Ativar venv e instalar dependências
-sudo -u mcpserver bash -c "
-    source venv/bin/activate
-    pip install --upgrade pip
-    pip install -e .
-"
+source venv/bin/activate
+pip install --upgrade pip
 
-# Criar arquivo de configuração
-log "⚙️ Criando arquivo de configuração..."
+# Instalar dependências
+if [[ -f "requirements.txt" ]]; then
+    pip install -r requirements.txt
+else
+    # Dependências principais se requirements.txt não existir
+    pip install fastapi uvicorn python-dotenv httpx pydantic
+fi
 
 # Debug: verificar variáveis antes de salvar
 # Validação final antes de salvar
@@ -280,66 +194,114 @@ log "   Token: ${LETSCLOUD_API_TOKEN:0:15}... (${#LETSCLOUD_API_TOKEN} chars)"
 log "   API Key: ${MCP_API_KEY:0:15}... (${#MCP_API_KEY} chars)"
 log "   Porta: $SERVER_PORT"
 
-sudo -u mcpserver tee "$MCP_HOME/.env" > /dev/null << EOF
-# LetsCloud MCP Server Configuration
+log "⚙️ Criando arquivo de configuração..."
+
+# Criar arquivo .env
+cat > "$ENV_FILE" << EOF
 LETSCLOUD_API_TOKEN=$LETSCLOUD_API_TOKEN
 MCP_API_KEY=$MCP_API_KEY
-HOST=0.0.0.0
-PORT=$SERVER_PORT
-ENVIRONMENT=production
-LOG_LEVEL=INFO
-
-# Security
-CORS_ORIGINS=*
-MAX_CONNECTIONS=100
-
-# Generated on $(date)
+SERVER_PORT=$SERVER_PORT
+DEBUG=false
 EOF
 
-log "✅ Arquivo de configuração criado em $MCP_HOME/.env"
+log "✅ Arquivo de configuração criado em $ENV_FILE"
 
-# Exibir informações finais
-echo
-echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║ ✅ DEPLOY CONCLUÍDO! ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
-echo
-
-# Definir valores padrão para as variáveis se não estiverem definidas
-SERVER_PORT=${SERVER_PORT:-8000}
-MCP_API_KEY=${MCP_API_KEY:-"ERRO-CHAVE-NAO-CONFIGURADA"}
-LETSCLOUD_API_TOKEN=${LETSCLOUD_API_TOKEN:-"ERRO-TOKEN-NAO-CONFIGURADO"}
-
-# Debug: verificar se as variáveis estão definidas corretamente
-if [[ "$MCP_API_KEY" == "ERRO-CHAVE-NAO-CONFIGURADA" ]]; then
-    warn "⚠️ Chave API não foi configurada corretamente!"
-    log "🔄 Gerando nova chave API..."
-    MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
-    log "🔐 Nova chave API gerada: $MCP_API_KEY"
-fi
+# Configurar serviço systemd
+log "🔧 Configurando serviço systemd..."
 
 # Obter IP público
-PUBLIC_IP=$(curl -s ifconfig.me || echo "localhost")
+PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || echo "localhost")
+
+cat > /etc/systemd/system/letscloud-mcp.service << EOF
+[Unit]
+Description=LetsCloud MCP Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=$PROJECT_DIR
+Environment=PATH=$PROJECT_DIR/venv/bin
+ExecStart=$PROJECT_DIR/venv/bin/python -m uvicorn server:app --host 0.0.0.0 --port $SERVER_PORT
+Restart=always
+RestartSec=10
+EnvironmentFile=$ENV_FILE
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=$WORK_DIR
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Recarregar systemd e iniciar serviço
+systemctl daemon-reload
+systemctl enable letscloud-mcp
+systemctl start letscloud-mcp
+
+# Aguardar serviço iniciar
+sleep 3
+
+# Verificar status
+if systemctl is-active --quiet letscloud-mcp; then
+    log "✅ Serviço iniciado com sucesso!"
+else
+    warn "⚠️ Serviço pode não ter iniciado corretamente. Verificando logs..."
+    journalctl -u letscloud-mcp --no-pager -n 10
+fi
+
+# Configurar firewall
+log "🔥 Configurando firewall..."
+ufw --force enable
+ufw allow ssh
+ufw allow $SERVER_PORT/tcp
+
+# Limpeza
+log "🧹 Limpeza final..."
+rm -f /tmp/mcp_config.env /tmp/deploy_as_user.sh
+
+# Obter URL final
+if [[ -n "$DOMAIN" ]]; then
+    BASE_URL="http://$DOMAIN:$SERVER_PORT"
+else
+    BASE_URL="http://$PUBLIC_IP:$SERVER_PORT"
+fi
+
+echo
+echo -e "${GREEN}"
+cat << "EOF"
+╔══════════════════════════════════════════════════════════╗
+║ ✅ DEPLOY CONCLUÍDO! ║
+╚══════════════════════════════════════════════════════════╝
+EOF
+echo -e "${NC}"
 
 log "📋 Informações do servidor:"
-echo -e " 🌐 URL: http://$PUBLIC_IP:$SERVER_PORT"
+echo -e " 🌐 URL: $BASE_URL"
 echo -e " 🔑 Chave API: $MCP_API_KEY"
-echo -e " 📊 Health Check: http://$PUBLIC_IP:$SERVER_PORT/health"
-echo -e " 📚 Documentação: http://$PUBLIC_IP:$SERVER_PORT/docs"
-echo
+echo -e " 📊 Health Check: $BASE_URL/health"
+echo -e " 📚 Documentação: $BASE_URL/docs"
 
+echo
 log "📋 Comandos úteis:"
-echo -e " Status: sudo systemctl status letscloud-mcp"
-echo -e " Logs: sudo journalctl -u letscloud-mcp -f"
-echo -e " Restart: sudo systemctl restart letscloud-mcp"
-echo
+echo -e " Status: systemctl status letscloud-mcp"
+echo -e " Logs: journalctl -u letscloud-mcp -f"
+echo -e " Restart: systemctl restart letscloud-mcp"
 
+echo
 log "🎉 Servidor pronto para uso!"
-echo
-echo -e "${YELLOW}⚠️ Salve a API Key: $MCP_API_KEY${NC}"
-echo -e "${YELLOW}⚠️ Configure seu cliente para usar: http://$PUBLIC_IP:$SERVER_PORT${NC}"
 
-# Limpeza de arquivos temporários (se executado via root switch)
-sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
-rm -f /tmp/deploy_as_user.sh 2>/dev/null || true
-rm -f /tmp/mcp_config.env 2>/dev/null || true 
+echo
+warn "⚠️ Salve a API Key: $MCP_API_KEY"
+warn "⚠️ Configure seu cliente para usar: $BASE_URL"
+
+# Teste de conectividade
+log "🔍 Testando conectividade..."
+if curl -f -s "$BASE_URL/health" >/dev/null; then
+    log "✅ Health check OK!"
+else
+    warn "⚠️ Health check falhou. Verifique os logs: journalctl -u letscloud-mcp -f"
+fi 
