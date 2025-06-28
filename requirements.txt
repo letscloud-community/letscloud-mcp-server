@@ -1,8 +1,8 @@
 # MCP Server dependencies
-mcp==1.1.0
-pydantic==2.10.3
-httpx==0.28.1
-asyncio-mqtt==0.16.2
+mcp==1.10.1
+pydantic>=2.10.3
+httpx>=0.28.1
+asyncio-mqtt>=0.16.2
 
 # LetsCloud API client dependencies
 requests==2.32.3

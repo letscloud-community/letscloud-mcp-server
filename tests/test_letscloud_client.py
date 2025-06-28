@@ -29,7 +29,7 @@ class TestLetsCloudClient:
     async def test_init(self):
         """Test client initialization."""
         assert self.client.api_token == self.api_token
-        assert self.client.base_url == "https://api.letscloud.io/v1"
+        assert self.client.base_url == "https://core.letscloud.io/api"
         assert "Bearer test-token-123" in self.client.headers["Authorization"]
 
     async def test_custom_base_url(self):
@@ -66,7 +66,7 @@ class TestLetsCloudClient:
         result = await self.client.list_servers()
         
         assert result == expected_servers
-        mock_request.assert_called_once_with("GET", "servers")
+        mock_request.assert_called_once_with("GET", "instances")
 
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')
     async def test_get_server(self, mock_request):
@@ -78,7 +78,7 @@ class TestLetsCloudClient:
         result = await self.client.get_server(server_id)
         
         assert result == expected_server
-        mock_request.assert_called_once_with("GET", f"servers/{server_id}")
+        mock_request.assert_called_once_with("GET", f"instances/{server_id}")
 
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')
     async def test_create_server(self, mock_request):
@@ -95,7 +95,7 @@ class TestLetsCloudClient:
         result = await self.client.create_server(server_data)
         
         assert result == expected_response
-        mock_request.assert_called_once_with("POST", "servers", json=server_data)
+        mock_request.assert_called_once_with("POST", "instances", json=server_data)
 
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')
     async def test_delete_server(self, mock_request):
@@ -105,7 +105,7 @@ class TestLetsCloudClient:
         
         await self.client.delete_server(server_id)
         
-        mock_request.assert_called_once_with("DELETE", f"servers/{server_id}")
+        mock_request.assert_called_once_with("DELETE", f"instances/{server_id}")
 
     # SSH Key Management Tests  
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')
@@ -142,7 +142,7 @@ class TestLetsCloudClient:
         result = await self.client.list_snapshots(server_id)
         
         assert result == expected_snapshots
-        mock_request.assert_called_once_with("GET", f"servers/{server_id}/snapshots")
+        mock_request.assert_called_once_with("GET", f"instances/{server_id}/snapshots")
 
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')
     async def test_create_snapshot(self, mock_request):
@@ -155,7 +155,7 @@ class TestLetsCloudClient:
         result = await self.client.create_snapshot(server_id, snapshot_data)
         
         assert result == expected_response
-        mock_request.assert_called_once_with("POST", f"servers/{server_id}/snapshots", json=snapshot_data)
+        mock_request.assert_called_once_with("POST", f"instances/{server_id}/snapshots", json=snapshot_data)
 
     # Resource Information Tests
     @patch('src.letscloud_mcp_server.letscloud_client.LetsCloudClient._make_request')

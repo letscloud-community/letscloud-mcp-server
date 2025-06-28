@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class LetsCloudClient:
     """Async LetsCloud API client."""
     
-    def __init__(self, api_token: str, base_url: str = "https://api.letscloud.io/v1"):
+    def __init__(self, api_token: str, base_url: str = "https://core.letscloud.io/api"):
         """
         Initialize the LetsCloud client.
         
@@ -26,7 +26,7 @@ class LetsCloudClient:
         self.api_token = api_token
         self.base_url = base_url
         self.headers = {
-            "Authorization": f"Bearer {api_token}",
+            "api-token": api_token,
             "Content-Type": "application/json",
             "User-Agent": "LetsCloud-MCP-Server/1.0.0"
         }
@@ -94,7 +94,8 @@ class LetsCloudClient:
         Returns:
             List of server objects
         """
-        return await self._make_request("GET", "servers")
+        response = await self._make_request("GET", "instances")
+        return response.get("data", [])
 
     async def get_server(self, server_id: int) -> Dict[str, Any]:
         """
@@ -106,7 +107,8 @@ class LetsCloudClient:
         Returns:
             Server object
         """
-        return await self._make_request("GET", f"servers/{server_id}")
+        response = await self._make_request("GET", f"instances/{server_id}")
+        return response.get("data", {})
 
     async def create_server(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -125,7 +127,8 @@ class LetsCloudClient:
         Returns:
             Created server object
         """
-        return await self._make_request("POST", "servers", json=data)
+        response = await self._make_request("POST", "instances", json=data)
+        return response.get("data", {})
 
     async def delete_server(self, server_id: int) -> None:
         """
@@ -134,7 +137,7 @@ class LetsCloudClient:
         Args:
             server_id: Server ID to delete
         """
-        await self._make_request("DELETE", f"servers/{server_id}")
+        await self._make_request("DELETE", f"instances/{server_id}")
 
     async def reboot_server(self, server_id: int) -> Dict[str, Any]:
         """
@@ -146,7 +149,8 @@ class LetsCloudClient:
         Returns:
             Operation result
         """
-        return await self._make_request("POST", f"servers/{server_id}/reboot")
+        response = await self._make_request("POST", f"instances/{server_id}/reboot")
+        return response.get("data", {})
 
     async def shutdown_server(self, server_id: int) -> Dict[str, Any]:
         """
@@ -158,7 +162,8 @@ class LetsCloudClient:
         Returns:
             Operation result
         """
-        return await self._make_request("POST", f"servers/{server_id}/shutdown")
+        response = await self._make_request("POST", f"instances/{server_id}/shutdown")
+        return response.get("data", {})
 
     async def start_server(self, server_id: int) -> Dict[str, Any]:
         """
@@ -170,7 +175,8 @@ class LetsCloudClient:
         Returns:
             Operation result
         """
-        return await self._make_request("POST", f"servers/{server_id}/start")
+        response = await self._make_request("POST", f"instances/{server_id}/start")
+        return response.get("data", {})
 
     # SSH Key Management Methods
     async def list_ssh_keys(self) -> List[Dict[str, Any]]:
@@ -180,7 +186,8 @@ class LetsCloudClient:
         Returns:
             List of SSH key objects
         """
-        return await self._make_request("GET", "ssh-keys")
+        response = await self._make_request("GET", "ssh-keys")
+        return response.get("data", [])
 
     async def get_ssh_key(self, key_id: int) -> Dict[str, Any]:
         """
@@ -192,7 +199,8 @@ class LetsCloudClient:
         Returns:
             SSH key object
         """
-        return await self._make_request("GET", f"ssh-keys/{key_id}")
+        response = await self._make_request("GET", f"ssh-keys/{key_id}")
+        return response.get("data", {})
 
     async def create_ssh_key(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -206,7 +214,8 @@ class LetsCloudClient:
         Returns:
             Created SSH key object
         """
-        return await self._make_request("POST", "ssh-keys", json=data)
+        response = await self._make_request("POST", "ssh-keys", json=data)
+        return response.get("data", {})
 
     async def delete_ssh_key(self, key_id: int) -> None:
         """
@@ -228,7 +237,8 @@ class LetsCloudClient:
         Returns:
             List of snapshot objects
         """
-        return await self._make_request("GET", f"servers/{server_id}/snapshots")
+        response = await self._make_request("GET", f"instances/{server_id}/snapshots")
+        return response.get("data", [])
 
     async def get_snapshot(self, server_id: int, snapshot_id: int) -> Dict[str, Any]:
         """
@@ -241,7 +251,8 @@ class LetsCloudClient:
         Returns:
             Snapshot object
         """
-        return await self._make_request("GET", f"servers/{server_id}/snapshots/{snapshot_id}")
+        response = await self._make_request("GET", f"instances/{server_id}/snapshots/{snapshot_id}")
+        return response.get("data", {})
 
     async def create_snapshot(self, server_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -256,7 +267,8 @@ class LetsCloudClient:
         Returns:
             Created snapshot object
         """
-        return await self._make_request("POST", f"servers/{server_id}/snapshots", json=data)
+        response = await self._make_request("POST", f"instances/{server_id}/snapshots", json=data)
+        return response.get("data", {})
 
     async def delete_snapshot(self, server_id: int, snapshot_id: int) -> None:
         """
@@ -266,7 +278,7 @@ class LetsCloudClient:
             server_id: Server ID
             snapshot_id: Snapshot ID to delete
         """
-        await self._make_request("DELETE", f"servers/{server_id}/snapshots/{snapshot_id}")
+        await self._make_request("DELETE", f"instances/{server_id}/snapshots/{snapshot_id}")
 
     async def restore_snapshot(self, server_id: int, snapshot_id: int) -> Dict[str, Any]:
         """
@@ -279,7 +291,8 @@ class LetsCloudClient:
         Returns:
             Restore operation result
         """
-        return await self._make_request("POST", f"servers/{server_id}/snapshots/{snapshot_id}/restore")
+        response = await self._make_request("POST", f"instances/{server_id}/snapshots/{snapshot_id}/restore")
+        return response.get("data", {})
 
     # Resource Information Methods
     async def list_plans(self) -> List[Dict[str, Any]]:
@@ -289,7 +302,8 @@ class LetsCloudClient:
         Returns:
             List of plan objects
         """
-        return await self._make_request("GET", "plans")
+        response = await self._make_request("GET", "plans")
+        return response.get("data", [])
 
     async def list_images(self) -> List[Dict[str, Any]]:
         """
@@ -298,7 +312,8 @@ class LetsCloudClient:
         Returns:
             List of image objects
         """
-        return await self._make_request("GET", "images")
+        response = await self._make_request("GET", "images")
+        return response.get("data", [])
 
     async def list_locations(self) -> List[Dict[str, Any]]:
         """
@@ -307,7 +322,8 @@ class LetsCloudClient:
         Returns:
             List of location objects
         """
-        return await self._make_request("GET", "locations")
+        response = await self._make_request("GET", "locations")
+        return response.get("data", [])
 
     async def get_account_info(self) -> Dict[str, Any]:
         """
@@ -316,11 +332,12 @@ class LetsCloudClient:
         Returns:
             Account information object
         """
-        return await self._make_request("GET", "account")
+        response = await self._make_request("GET", "profile")
+        return response.get("data", {})
 
     def __del__(self):
         """Cleanup on deletion."""
-        if self._client:
+        if hasattr(self, '_client') and self._client:
             # Try to close the client if it exists
             try:
                 asyncio.get_event_loop().create_task(self.close())

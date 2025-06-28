@@ -11,7 +11,7 @@ from mcp.types import Tool
 # Server Management Tools
 list_servers_tool = Tool(
     name="list_servers",
-    description="List all servers in your LetsCloud account",
+    description="List all instances in your LetsCloud account",
     inputSchema={
         "type": "object",
         "properties": {},
@@ -21,13 +21,13 @@ list_servers_tool = Tool(
 
 get_server_tool = Tool(
     name="get_server",
-    description="Get detailed information about a specific server",
+    description="Get detailed information about a specific instance",
     inputSchema={
         "type": "object",
         "properties": {
             "server_id": {
                 "type": "integer",
-                "description": "The ID of the server to retrieve"
+                "description": "The ID of the instance to retrieve"
             }
         },
         "required": ["server_id"],
@@ -37,7 +37,7 @@ get_server_tool = Tool(
 
 create_server_tool = Tool(
     name="create_server",
-    description="Create a new server with specified configuration",
+    description="Create a new instance with specified configuration",
     inputSchema={
         "type": "object",
         "properties": {
