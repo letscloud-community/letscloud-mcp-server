@@ -34,7 +34,8 @@
 - **Autenticação:** Bearer token
 - **SSL/HTTPS:** Certificados automáticos
 - **Monitoramento:** Health checks + logs
-- **Deploy:** Script automatizado de 1 comando
+- **Deploy:** Scripts automatizados (deploy.sh em inglês, deploy_pt.sh em português)
+- **🤖 Deploy Inteligente:** Criação automática de usuário se executado como root
 - **Uso:** Ideal para equipes e produção 24/7
 
 ## 🌍 **Documentação Bilíngue**
@@ -92,10 +93,18 @@
 - Cline: Suporte completo
 
 ### **✅ Deploy Online**
-- Script de deploy automatizado
+- **[scripts/deploy.sh](scripts/deploy.sh)** - Deploy script em inglês
+- **[scripts/deploy_pt.sh](scripts/deploy_pt.sh)** - Script de deploy em português
 - Nginx + SSL configurado
 - Systemd service funcionando
 - Health monitoring ativo
+
+### **🤖 Deploy Inteligente** 🆕
+- **Detecção automática** de usuário root
+- **Criação automática** de usuário não-root
+- **Transição transparente** para execução segura
+- **Fallback manual** com instruções claras
+- **Zero configuração** necessária pelo usuário
 
 ## 📊 **Infraestrutura do Usuário**
 
@@ -121,6 +130,7 @@
 - ✅ Rate limiting
 - ✅ Security headers
 - ✅ Non-root user execution
+- ✅ **Deploy Inteligente:** Criação automática de usuário seguro se executado como root
 
 ### **Monitoring**
 - ✅ Health checks automatizados
@@ -170,6 +180,7 @@
 **Recursos Destacados:**
 - 🔥 **20 ferramentas MCP** completamente funcionais
 - 🌐 **Deploy online** com script automatizado
+- 🤖 **Deploy inteligente** com criação automática de usuário
 - 🌍 **Suporte bilíngue** (PT/EN)
 - 🔒 **Segurança empresarial**
 - 📚 **Documentação completa**

@@ -10,9 +10,11 @@
 
 ### **2. Run Deploy Script**
 ```bash
-# SSH into VM and execute:
+# SSH into VM and execute (can run as root):
 curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
+
+**💡 Tip:** If running as root, the script will offer to automatically create a non-root user and continue the installation!
 
 ## 🎯 **What the script does automatically:**
 

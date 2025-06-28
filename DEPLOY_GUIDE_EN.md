@@ -38,9 +38,47 @@ This guide shows how to configure a VM and host the LetsCloud MCP Server online,
 "Create an Ubuntu 22.04 VM with 2GB RAM in São Paulo to host my MCP server"
 ```
 
+**💡 Tip:** The deploy script works with both root and non-root users. If running as root, it offers to automatically create a secure user!
+
 ---
 
-## 🔧 **Step 2: Configure the Server**
+## 🚀 **Automated Deploy (Recommended)**
+
+### **🤖 One-Command Installation**
+```bash
+# SSH into VM and execute (can run as root):
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+```
+
+**🎯 Smart Functionality:**
+- **If running as root:** Script detects and offers to automatically create a secure user
+- **If running as user:** Continues normally
+- **Fully automated process:** No manual intervention required
+
+### **💬 Example of Root Execution:**
+```bash
+root@vm:~# curl -fsSL https://raw.githubusercontent.com/[...]/deploy.sh | bash
+
+⚠️  Detected that you are running as root!
+For security, it's recommended to run as a non-root user.
+
+🤔 Do you want to automatically create a 'mcpserver' user and continue? (y/n): y
+
+👤 Creating user 'mcpserver'...
+✅ User 'mcpserver' created successfully!
+🔄 Switching to user 'mcpserver' and continuing...
+
+🚀 Starting installation...
+📦 Updating system...
+🔧 Installing dependencies...
+[... installation continues automatically ...]
+```
+
+---
+
+## 🔧 **Manual Installation (Optional)**
+
+If you prefer to do it manually or customize:
 
 ### **1. Connect via SSH**
 ```bash

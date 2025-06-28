@@ -36,7 +36,8 @@ Este é o índice completo da documentação do projeto LetsCloud MCP Server. Es
 
 - **📊 [Release Status](RELEASE_STATUS.md)** - Production readiness report
 - **🛠️ [HTTP Server Code](src/letscloud_mcp_server/http_server.py)** - Online API implementation
-- **🚀 [Deploy Script](scripts/deploy.sh)** - Automated deployment
+- **🚀 [Deploy Script (EN)](scripts/deploy.sh)** - Automated deployment (English)
+- **🚀 [Deploy Script (PT)](scripts/deploy_pt.sh)** - Script de deploy automatizado (Português)
 - **📋 [Requirements](requirements.txt)** - Python dependencies
 
 ---
@@ -68,7 +69,7 @@ curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-s
 **Português:**
 ```bash
 # Crie uma VM e execute:
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh | bash
 ```
 
 ---

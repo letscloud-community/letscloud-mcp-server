@@ -10,9 +10,11 @@
 
 ### **2. Executar Script de Deploy**
 ```bash
-# SSH na VM e executar:
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+# SSH na VM e executar (pode ser como root):
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh | bash
 ```
+
+**💡 Dica:** Se executar como root, o script oferecerá criar automaticamente um usuário não-root e continuar a instalação!
 
 ## 🎯 **O que o script faz automaticamente:**
 
@@ -112,7 +114,7 @@ sudo nginx -t && sudo systemctl status nginx
 sudo -u mcpserver /home/mcpserver/letscloud-mcp-server/venv/bin/python -c "import letscloud_mcp_server; print('OK')"
 
 # Redeployar completamente?
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh | bash
 ```
 
 ---
