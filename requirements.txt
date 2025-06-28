@@ -8,6 +8,11 @@ asyncio-mqtt>=0.16.2
 requests==2.32.3
 python-dotenv==1.0.1
 
+# HTTP Server dependencies (for remote access)
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+websockets>=13.1
+
 # Development and testing
 pytest==8.3.4
 pytest-asyncio==0.25.0
@@ -16,7 +21,6 @@ pytest-mock==3.14.0
 
 # Optional: for server hosting capabilities  
 uvicorn==0.32.1
-fastapi==0.115.6
 
 # AI Integration (Optional)
 openai>=1.0.0

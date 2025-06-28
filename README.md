@@ -23,11 +23,13 @@ No programming. No technical commands. Just natural conversation in **English** 
 
 ## 🚀 Quick Start
 
-### 1. Get Your LetsCloud API Key
+### **Option 1: Local Installation (Desktop)**
+
+#### **1. Get Your LetsCloud API Key**
 - Visit [LetsCloud Dashboard](https://my.letscloud.io/profile/client-api)
 - Enable and copy API key 
 
-### 2. Install & Configure Claude Desktop
+#### **2. Install & Configure Claude Desktop**
 - Download [Claude Desktop](https://claude.ai/download)
 - Add this to your configuration file:
 
@@ -45,12 +47,34 @@ No programming. No technical commands. Just natural conversation in **English** 
 }
 ```
 
-### 3. Install the MCP Server
+#### **3. Install the MCP Server**
 ```bash
 pip install git+https://github.com/letscloud/letscloud-mcp-server.git
 ```
 
-### 4. Start Talking!
+### **Option 2: Online Deployment (Recommended for Teams)** 🆕
+
+#### **🌐 Deploy to Cloud in 1 Command**
+```bash
+# Create VM and run:
+curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+```
+
+**Result:** Your MCP server running 24/7 online, accessible from anywhere!
+
+📚 **Complete Guides:**
+- **📖 [Complete Deployment Guide](DEPLOY_GUIDE_EN.md)** - Step-by-step deployment
+- **⚡ [Quick Deploy Guide](QUICK_DEPLOY_EN.md)** - One-command setup
+- **🇧🇷 [Guia de Deploy (Português)](DEPLOY_GUIDE.md)** - Guia completo em português
+
+#### **Benefits of Online Deployment:**
+- ✅ **24/7 Availability** - Works even when your computer is off
+- ✅ **Team Access** - Multiple users can use the same server
+- ✅ **Better Performance** - Optimized latency to LetsCloud API
+- ✅ **Professional Setup** - SSL, monitoring, auto-restart
+- ✅ **Remote Access** - Use from any device, anywhere
+
+### **4. Start Talking!**
 Open Claude Desktop and say:
 ```
 "Hi! Show me my current servers and help me manage my infrastructure."
@@ -99,7 +123,7 @@ AI: "Perfect! Creating a bakery website with online ordering..."
 ### Emergency Response
 ```
 You: "HELP! My website is down during our biggest sale!"
-AI: "�� Emergency detected! Investigating immediately..."
+AI: "🚨 Emergency detected! Investigating immediately..."
 🔍 Diagnosed: Server overload from high traffic
 ⚡ Creating emergency server with 3x capacity
 ✅ Site restored in 8 minutes with auto-scaling
@@ -114,6 +138,7 @@ AI: "�� Emergency detected! Investigating immediately..."
 ✅ **24/7 Monitoring** - Proactive problem prevention  
 ✅ **Scalable Architecture** - Grows with your business  
 ✅ **Enterprise Security** - Bank-level data protection  
+✅ **Online Deployment** - Remote access from anywhere 🆕
 
 ## 🤖 Supported AI Platforms
 
@@ -122,31 +147,35 @@ AI: "�� Emergency detected! Investigating immediately..."
 - **✅ Zed Editor**
 - **⏳ ChatGPT** (Coming soon to GPT Store)
 - **✅ Any MCP-compatible client**
+- **🆕 HTTP/WebSocket API** - Remote access via REST API
 
-## 🔧 Installation
+## 🔧 Installation Options
 
-### Prerequisites
-- Python 3.11+
-- LetsCloud account with API access
-- MCP-compatible AI client
-
-### Option A: Install from GitHub (Recommended)
+### **Local Installation**
 ```bash
+# Option A: Install from GitHub (Recommended)
 pip install git+https://github.com/letscloud/letscloud-mcp-server.git
-```
 
-### Option B: Install from Source  
-```bash
+# Option B: Install from Source  
 git clone https://github.com/letscloud/letscloud-mcp-server.git
 cd letscloud-mcp-server
 pip install -e .
-```
 
-### Option C: Install from PyPI (Coming Soon)
-```bash
-# Will be available after publishing to PyPI
+# Option C: Install from PyPI (Coming Soon)
 pip install letscloud-mcp-server
 ```
+
+### **Online Deployment** 🆕
+```bash
+# One-command cloud deployment
+curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+```
+
+**📚 Complete Deployment Documentation:**
+- **🇺🇸 [English Deploy Guide](DEPLOY_GUIDE_EN.md)** - Complete step-by-step
+- **🇧🇷 [Portuguese Deploy Guide](DEPLOY_GUIDE.md)** - Guia completo em português
+- **⚡ [Quick Deploy (EN)](QUICK_DEPLOY_EN.md)** - One-command setup
+- **⚡ [Deploy Rápido (PT)](QUICK_DEPLOY.md)** - Instalação com 1 comando
 
 ## 🌍 Language Support
 
@@ -161,6 +190,21 @@ The AI assistants will automatically detect your language and respond appropriat
 - Business contexts (Global vs Brazilian markets)
 
 **🇧🇷 Para usuários brasileiros:** Acesse a [documentação completa em português](README_PT.md).
+
+## 🚀 Deployment Modes
+
+### **🏠 Local Mode**
+- **Best for:** Individual developers, testing, development
+- **Installation:** Simple pip install
+- **Requirements:** Local Python environment
+- **Access:** Local computer only
+
+### **🌐 Online Mode** 🆕  
+- **Best for:** Teams, production, 24/7 availability
+- **Installation:** One-command cloud deployment
+- **Requirements:** VM/VPS with Ubuntu
+- **Access:** From anywhere via HTTP/WebSocket API
+- **Features:** SSL, monitoring, auto-restart, team access
 
 ## 📞 Support & Community
 
