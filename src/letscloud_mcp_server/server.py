@@ -181,8 +181,7 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> CallToolResu
 def _create_success_result(text: str) -> CallToolResult:
     """Create a successful CallToolResult with proper structure."""
     return CallToolResult(
-        content=[TextContent(type="text", text=text)],
-        isError=False
+        content=[TextContent(type="text", text=text)]
     )
 
 def _create_error_result(error_message: str) -> CallToolResult:
