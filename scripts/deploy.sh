@@ -83,29 +83,21 @@ if [[ $EUID -eq 0 ]]; then
             log "🔐 API Key auto-generated: $MCP_API_KEY"
         fi
         
-        # Export variables for mcpserver user
-        export LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
-        
-        # Copy script to /tmp with configurations (no quotes to allow interpolation)
-        cat > /tmp/deploy_as_user.sh << SCRIPT_EOF
-#!/bin/bash
-# Configurations passed from root script
+        # Save configurations to temporary file
+        cat > /tmp/mcp_config.env << EOF
 LETSCLOUD_API_TOKEN="$LETSCLOUD_API_TOKEN"
-MCP_API_KEY="$MCP_API_KEY"  
+MCP_API_KEY="$MCP_API_KEY"
 SERVER_PORT="$SERVER_PORT"
 DOMAIN="$DOMAIN"
-
-# Continue execution of original script (skip configuration part)
 SKIP_CONFIG=true
-SCRIPT_EOF
+EOF
         
-        # Add rest of script after configuration
-        sed -n '/^# Check if sudo is available/,$p' "$0" >> /tmp/deploy_as_user.sh
-        
+        # Copy original script to /tmp
+        cp "$0" /tmp/deploy_as_user.sh
         chmod +x /tmp/deploy_as_user.sh
         
-        # Execute as mcpserver IN INTERACTIVE MODE
-        exec sudo -u mcpserver -i /tmp/deploy_as_user.sh
+        # Execute as mcpserver loading the configurations
+        exec sudo -u mcpserver -i bash -c "source /tmp/mcp_config.env && /tmp/deploy_as_user.sh"
         
         # This line will never be reached due to exec
         exit 0
@@ -118,6 +110,13 @@ SCRIPT_EOF
         echo "4. Run script: curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash"
         exit 1
     fi
+fi
+
+# Load configurations if available (for smart deploy execution)
+if [[ -f "/tmp/mcp_config.env" && "$SKIP_CONFIG" != "true" ]]; then
+    log "📥 Loading configurations from smart deploy..."
+    source /tmp/mcp_config.env
+    log "✅ Configurations loaded successfully"
 fi
 
 # Check if sudo is available
@@ -537,4 +536,5 @@ echo -e "${YELLOW}⚠️  Configure your client to use: http://$SERVER_NAME:$SER
 
 # Clean up temporary files (if executed via root switch)
 sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
-rm -f /tmp/deploy_as_user.sh 2>/dev/null || true 
+rm -f /tmp/deploy_as_user.sh 2>/dev/null || true
+rm -f /tmp/mcp_config.env 2>/dev/null || true 

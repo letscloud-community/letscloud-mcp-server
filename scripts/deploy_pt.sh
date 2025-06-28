@@ -83,29 +83,21 @@ if [[ $EUID -eq 0 ]]; then
             log "🔐 Chave API gerada automaticamente: $MCP_API_KEY"
         fi
         
-        # Exportar variáveis para o usuário mcpserver
-        export LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
-        
-        # Copiar script para /tmp com as configurações (sem aspas para permitir interpolação)
-        cat > /tmp/deploy_as_user.sh << SCRIPT_EOF
-#!/bin/bash
-# Configurações passadas do script root
+        # Salvar configurações em arquivo temporário
+        cat > /tmp/mcp_config.env << EOF
 LETSCLOUD_API_TOKEN="$LETSCLOUD_API_TOKEN"
-MCP_API_KEY="$MCP_API_KEY"  
+MCP_API_KEY="$MCP_API_KEY"
 SERVER_PORT="$SERVER_PORT"
 DOMAIN="$DOMAIN"
-
-# Continuar execução do script original (pular parte de configuração)
 SKIP_CONFIG=true
-SCRIPT_EOF
+EOF
         
-        # Adicionar resto do script após a configuração
-        sed -n '/^# Verificar se sudo está disponível/,$p' "$0" >> /tmp/deploy_as_user.sh
-        
+        # Copiar o script original para /tmp
+        cp "$0" /tmp/deploy_as_user.sh
         chmod +x /tmp/deploy_as_user.sh
         
-        # Executar como mcpserver EM MODO INTERATIVO
-        exec sudo -u mcpserver -i /tmp/deploy_as_user.sh
+        # Executar como mcpserver carregando as configurações
+        exec sudo -u mcpserver -i bash -c "source /tmp/mcp_config.env && /tmp/deploy_as_user.sh"
         
         # Esta linha nunca será alcançada devido ao exec
         exit 0
@@ -118,6 +110,13 @@ SCRIPT_EOF
         echo "4. Executar script: curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh | bash"
         exit 1
     fi
+fi
+
+# Carregar configurações se disponíveis (para execução via smart deploy)
+if [[ -f "/tmp/mcp_config.env" && "$SKIP_CONFIG" != "true" ]]; then
+    log "📥 Carregando configurações do smart deploy..."
+    source /tmp/mcp_config.env
+    log "✅ Configurações carregadas com sucesso"
 fi
 
 # Verificar se sudo está disponível
@@ -313,4 +312,5 @@ echo -e "${YELLOW}⚠️ Configure seu cliente para usar: http://$PUBLIC_IP:$SER
 
 # Limpeza de arquivos temporários (se executado via root switch)
 sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
-rm -f /tmp/deploy_as_user.sh 2>/dev/null || true 
+rm -f /tmp/deploy_as_user.sh 2>/dev/null || true
+rm -f /tmp/mcp_config.env 2>/dev/null || true 
