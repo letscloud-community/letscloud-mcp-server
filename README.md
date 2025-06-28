@@ -56,20 +56,6 @@ Open Claude Desktop and say:
 "Hi! Show me my current servers and help me manage my infrastructure."
 ```
 
-## 📚 Complete Guides
-
-### 🇺🇸 English Documentation
-- **[User Guide](examples/README_EN.md)** - Everything you need to get started
-- **[How to Use with AI](examples/HOW_TO_USE_WITH_AI_EN.md)** - Complete usage guide
-- **[Configuration Guide](examples/AI_CONFIGURATION_EN.md)** - Step-by-step setup
-- **[Conversation Examples](examples/CONVERSATION_EXAMPLES_EN.md)** - Real scenarios and dialogues
-
-### 🇧🇷 Documentação em Português  
-- **[Guia do Usuário](examples/README.md)** - Tudo que você precisa para começar
-- **[Como Usar com IA](examples/COMO_USAR_COM_IA.md)** - Guia completo de uso
-- **[Configuração de IA](examples/CONFIGURACAO_IA.md)** - Configuração passo a passo
-- **[Exemplos de Conversas](examples/CONVERSAS_EXEMPLOS.md)** - Cenários reais e diálogos
-
 ## 🛠️ What You Can Manage
 
 ### Server Operations
@@ -178,7 +164,6 @@ The AI assistants will automatically detect your language and respond appropriat
 
 ## 📞 Support & Community
 
-- **📖 Documentation**: Complete guides in `/examples/`
 - **🐛 Bug Reports**: [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
 - **💬 Questions**: [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
 - **🌐 LetsCloud Support**: [support@letscloud.io](mailto:support@letscloud.io)
@@ -198,11 +183,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [LetsCloud](https://letscloud.io) for the infrastructure API
 - The open source community for inspiration and support
 
----
-
-**Ready to revolutionize how you manage infrastructure?**
-
-🚀 **[Start with our Quick Setup Guide →](examples/README_EN.md)**  
-🇧🇷 **[Comece com nosso Guia Rápido →](examples/README.md)**
-
-*Manage servers like a pro, without being one.* 

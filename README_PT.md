@@ -50,20 +50,6 @@ Abra Claude Desktop e diga:
 "Oi! Mostre meus servidores atuais e me ajude a gerenciar minha infraestrutura."
 ```
 
-## 📚 Guias Completos
-
-### 🇧🇷 Documentação em Português  
-- **[Guia do Usuário](examples/README.md)** - Tudo que você precisa para começar
-- **[Como Usar com IA](examples/COMO_USAR_COM_IA.md)** - Guia completo de uso
-- **[Configuração de IA](examples/CONFIGURACAO_IA.md)** - Configuração passo a passo
-- **[Exemplos de Conversas](examples/CONVERSAS_EXEMPLOS.md)** - Cenários reais e diálogos
-
-### 🇺🇸 English Documentation
-- **[User Guide](examples/README_EN.md)** - Everything you need to get started
-- **[How to Use with AI](examples/HOW_TO_USE_WITH_AI_EN.md)** - Complete usage guide
-- **[Configuration Guide](examples/AI_CONFIGURATION_EN.md)** - Step-by-step setup
-- **[Conversation Examples](examples/CONVERSATION_EXAMPLES_EN.md)** - Real scenarios and dialogues
-
 ## 🛠️ O que Você Pode Gerenciar
 
 ### Operações de Servidor
@@ -166,7 +152,6 @@ Todos os exemplos de conversas e guias estão disponíveis em ambos os idiomas.
 
 ## 📞 Suporte e Comunidade
 
-- **📖 Documentação**: Guias completos em `/examples/`
 - **🐛 Relatórios de Bug**: [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
 - **💬 Perguntas**: [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
 - **🌐 Suporte LetsCloud**: [support@letscloud.io](mailto:support@letscloud.io)
@@ -174,11 +159,3 @@ Todos os exemplos de conversas e guias estão disponíveis em ambos os idiomas.
 ## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
----
-
-**Pronto para revolucionar como você gerencia infraestrutura?**
-
-🚀 **[Comece com nosso Guia de Configuração Rápida →](examples/README.md)**
-
-*Gerencie servidores como um profissional, sem ser um.* 
