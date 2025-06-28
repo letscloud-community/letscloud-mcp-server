@@ -62,21 +62,17 @@ if [[ $EUID -eq 0 ]]; then
         
         log "🔄 Mudando para usuário 'mcpserver' e continuando..."
         
-        # Copiar script para /tmp e executar como mcpserver
+        # Copiar script para /tmp e executar como mcpserver INTERATIVAMENTE
         cp "$0" /tmp/deploy_as_user.sh 2>/dev/null || {
             # Se não conseguir copiar o script atual, baixar novamente
             curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy_pt.sh > /tmp/deploy_as_user.sh
         }
         chmod +x /tmp/deploy_as_user.sh
         
-        # Executar como mcpserver
-        su - mcpserver -c "/tmp/deploy_as_user.sh"
+        # Executar como mcpserver EM MODO INTERATIVO
+        exec sudo -u mcpserver -i /tmp/deploy_as_user.sh
         
-        # Limpar arquivo sudoers temporário
-        rm -f /etc/sudoers.d/mcpserver-temp
-        rm -f /tmp/deploy_as_user.sh
-        
-        log "🎉 Deploy concluído! O usuário 'mcpserver' foi criado e o servidor está configurado."
+        # Esta linha nunca será alcançada devido ao exec
         exit 0
     else
         echo
@@ -245,4 +241,8 @@ echo
 log "🎉 Servidor pronto para uso!"
 echo
 echo -e "${YELLOW}⚠️ Salve a API Key: $MCP_API_KEY${NC}"
-echo -e "${YELLOW}⚠️ Configure seu cliente para usar: http://$(curl -s ifconfig.me):$SERVER_PORT${NC}" 
+echo -e "${YELLOW}⚠️ Configure seu cliente para usar: http://$(curl -s ifconfig.me):$SERVER_PORT${NC}"
+
+# Limpeza de arquivos temporários (se executado via root switch)
+sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
+rm -f /tmp/deploy_as_user.sh 2>/dev/null || true 

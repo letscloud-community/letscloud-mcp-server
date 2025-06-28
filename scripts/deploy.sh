@@ -62,21 +62,17 @@ if [[ $EUID -eq 0 ]]; then
         
         log "🔄 Switching to user 'mcpserver' and continuing..."
         
-        # Copy script to /tmp and execute as mcpserver
+        # Copy script to /tmp and execute as mcpserver INTERACTIVELY
         cp "$0" /tmp/deploy_as_user.sh 2>/dev/null || {
             # If can't copy current script, download again
             curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh > /tmp/deploy_as_user.sh
         }
         chmod +x /tmp/deploy_as_user.sh
         
-        # Execute as mcpserver
-        su - mcpserver -c "/tmp/deploy_as_user.sh"
+        # Execute as mcpserver IN INTERACTIVE MODE
+        exec sudo -u mcpserver -i /tmp/deploy_as_user.sh
         
-        # Clean up temporary sudoers file
-        rm -f /etc/sudoers.d/mcpserver-temp
-        rm -f /tmp/deploy_as_user.sh
-        
-        log "🎉 Deploy completed! User 'mcpserver' was created and server is configured."
+        # This line will never be reached due to exec
         exit 0
     else
         echo
@@ -468,4 +464,8 @@ echo
 log "🎉 Server ready for use!"
 echo
 echo -e "${YELLOW}⚠️  Save the API Key: $MCP_API_KEY${NC}"
-echo -e "${YELLOW}⚠️  Configure your client to use: http://$SERVER_NAME${NC}" 
+echo -e "${YELLOW}⚠️  Configure your client to use: http://$SERVER_NAME${NC}"
+
+# Clean up temporary files (if executed via root switch)
+sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
+rm -f /tmp/deploy_as_user.sh 2>/dev/null || true 
