@@ -62,11 +62,46 @@ if [[ $EUID -eq 0 ]]; then
         
         log "🔄 Switching to user 'mcpserver' and continuing..."
         
-        # Copy script to /tmp and execute as mcpserver INTERACTIVELY
-        cp "$0" /tmp/deploy_as_user.sh 2>/dev/null || {
-            # If can't copy current script, download again
-            curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh > /tmp/deploy_as_user.sh
-        }
+        # First collect configuration as root
+        echo
+        log "📋 Initial configuration (as root)..."
+        echo
+        
+        read -p "🔑 LetsCloud API Token: " LETSCLOUD_API_TOKEN
+        while [[ -z "$LETSCLOUD_API_TOKEN" ]]; do
+            read -p "🔑 LetsCloud API Token (required): " LETSCLOUD_API_TOKEN
+        done
+        
+        read -p "🔐 HTTP API Key (leave empty to auto-generate): " MCP_API_KEY
+        read -p "🌐 Server Port [8000]: " SERVER_PORT
+        SERVER_PORT=${SERVER_PORT:-8000}
+        read -p "🏠 Domain (optional, leave empty to use IP): " DOMAIN
+        
+        # Generate API key if not provided
+        if [[ -z "$MCP_API_KEY" ]]; then
+            MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
+            log "🔐 API Key auto-generated: $MCP_API_KEY"
+        fi
+        
+        # Export variables for mcpserver user
+        export LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
+        
+        # Copy script to /tmp with configurations
+        cat > /tmp/deploy_as_user.sh << 'SCRIPT_EOF'
+#!/bin/bash
+# Configurations passed from root script
+LETSCLOUD_API_TOKEN="$LETSCLOUD_API_TOKEN"
+MCP_API_KEY="$MCP_API_KEY"  
+SERVER_PORT="$SERVER_PORT"
+DOMAIN="$DOMAIN"
+
+# Continue execution of original script (skip configuration part)
+SKIP_CONFIG=true
+SCRIPT_EOF
+        
+        # Add rest of script after configuration
+        sed -n '/^# Check if sudo is available/,$p' "$0" >> /tmp/deploy_as_user.sh
+        
         chmod +x /tmp/deploy_as_user.sh
         
         # Execute as mcpserver IN INTERACTIVE MODE
@@ -111,19 +146,27 @@ get_input() {
     eval "$var_name='$input'"
 }
 
-# Request user configurations
-log "📋 Initial configuration..."
-echo
+# Request user configurations (skip if already configured via root)
+if [[ "$SKIP_CONFIG" != "true" ]]; then
+    log "📋 Initial configuration..."
+    echo
 
-get_input "🔑 LetsCloud API Token" "LETSCLOUD_API_TOKEN"
-get_input "🔐 HTTP API Key (leave empty to auto-generate)" "MCP_API_KEY"
-get_input "🌐 Server Port" "SERVER_PORT" "8000"
-get_input "🏠 Domain (optional, leave empty to use IP)" "DOMAIN"
+    get_input "🔑 LetsCloud API Token" "LETSCLOUD_API_TOKEN"
+    get_input "🔐 HTTP API Key (leave empty to auto-generate)" "MCP_API_KEY"
+    get_input "🌐 Server Port" "SERVER_PORT" "8000"
+    get_input "🏠 Domain (optional, leave empty to use IP)" "DOMAIN"
 
-# Generate API key if not provided
-if [[ -z "$MCP_API_KEY" ]]; then
-    MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
-    log "🔐 API Key auto-generated: $MCP_API_KEY"
+    # Generate API key if not provided
+    if [[ -z "$MCP_API_KEY" ]]; then
+        MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
+        log "🔐 API Key auto-generated: $MCP_API_KEY"
+    fi
+else
+    log "📋 Using configurations passed from root script..."
+    log "🔑 Token: ${LETSCLOUD_API_TOKEN:0:10}..."
+    log "🔐 API Key: ${MCP_API_KEY:0:10}..."
+    log "🌐 Port: $SERVER_PORT"
+    log "🏠 Domain: ${DOMAIN:-"(automatic IP)"}"
 fi
 
 echo
@@ -446,14 +489,23 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║                    ✅ DEPLOY COMPLETED!                  ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo
+# Define default values for variables if not set
+SERVER_PORT=${SERVER_PORT:-8000}
+MCP_API_KEY=${MCP_API_KEY:-"ERROR-KEY-NOT-CONFIGURED"}
+LETSCLOUD_API_TOKEN=${LETSCLOUD_API_TOKEN:-"ERROR-TOKEN-NOT-CONFIGURED"}
+
+# Get public IP
+PUBLIC_IP=$(curl -s ifconfig.me || echo "localhost")
+SERVER_NAME=${DOMAIN:-$PUBLIC_IP}
+
 log "📋 Server information:"
-echo -e "   🌐 URL: http://$SERVER_NAME"
+echo -e "   🌐 URL: http://$SERVER_NAME:$SERVER_PORT"
 if [[ -n "$DOMAIN" ]]; then
     echo -e "   🔒 HTTPS: https://$DOMAIN (if SSL configured)"
 fi
 echo -e "   🔑 API Key: $MCP_API_KEY"
-echo -e "   📊 Health Check: http://$SERVER_NAME/health"
-echo -e "   📚 Documentation: http://$SERVER_NAME/docs"
+echo -e "   📊 Health Check: http://$SERVER_NAME:$SERVER_PORT/health"
+echo -e "   📚 Documentation: http://$SERVER_NAME:$SERVER_PORT/docs"
 echo
 log "📋 Useful commands:"
 echo -e "   Status: sudo systemctl status letscloud-mcp"
@@ -464,7 +516,7 @@ echo
 log "🎉 Server ready for use!"
 echo
 echo -e "${YELLOW}⚠️  Save the API Key: $MCP_API_KEY${NC}"
-echo -e "${YELLOW}⚠️  Configure your client to use: http://$SERVER_NAME${NC}"
+echo -e "${YELLOW}⚠️  Configure your client to use: http://$SERVER_NAME:$SERVER_PORT${NC}"
 
 # Clean up temporary files (if executed via root switch)
 sudo rm -f /etc/sudoers.d/mcpserver-temp 2>/dev/null || true
