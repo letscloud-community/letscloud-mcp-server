@@ -145,10 +145,24 @@ get_input() {
     eval "$var_name='$input'"
 }
 
-# Solicitar configurações do usuário (pular se já configurado via root)
-if [[ "$SKIP_CONFIG" != "true" ]]; then
-    log "📋 Configuração inicial..."
+# FORÇA configuração se as variáveis não estão válidas
+NEED_CONFIG=false
+
+# Verificar se precisamos de configuração
+if [[ -z "$LETSCLOUD_API_TOKEN" || "$LETSCLOUD_API_TOKEN" == "echo"* ]]; then
+    NEED_CONFIG=true
+fi
+
+if [[ -z "$MCP_API_KEY" || "$MCP_API_KEY" == "log"* || "$MCP_API_KEY" == "ERROR"* ]]; then
+    NEED_CONFIG=true  
+fi
+
+if [[ "$NEED_CONFIG" == "true" ]]; then
+    log "📋 Configuração necessária (variáveis não definidas)..."
     echo
+
+    # Limpar variáveis corrompidas
+    unset LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
 
     get_input "🔑 Token da API LetsCloud" "LETSCLOUD_API_TOKEN"
     get_input "🔐 Chave da API HTTP (deixe vazio para gerar)" "MCP_API_KEY"
@@ -160,10 +174,14 @@ if [[ "$SKIP_CONFIG" != "true" ]]; then
         MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
         log "🔐 Chave API gerada automaticamente: $MCP_API_KEY"
     fi
+    
+    log "✅ Configuração concluída!"
+    log "🔑 Token: ${LETSCLOUD_API_TOKEN:0:15}..."
+    log "🔐 API Key: ${MCP_API_KEY:0:15}..."
 else
-    log "📋 Usando configurações passadas pelo script root..."
-    log "🔑 Token: ${LETSCLOUD_API_TOKEN:0:10}..."
-    log "🔐 API Key: ${MCP_API_KEY:0:10}..."
+    log "📋 Usando configurações válidas existentes..."
+    log "🔑 Token: ${LETSCLOUD_API_TOKEN:0:15}..."
+    log "🔐 API Key: ${MCP_API_KEY:0:15}..."
     log "🌐 Porta: $SERVER_PORT"
     log "🏠 Domínio: ${DOMAIN:-"(IP automático)"}"
 fi
@@ -246,9 +264,20 @@ sudo -u mcpserver bash -c "
 log "⚙️ Criando arquivo de configuração..."
 
 # Debug: verificar variáveis antes de salvar
+# Validação final antes de salvar
+if [[ -z "$LETSCLOUD_API_TOKEN" || "$LETSCLOUD_API_TOKEN" == "echo"* ]]; then
+    error "❌ Token da API LetsCloud inválido ou não definido!"
+    exit 1
+fi
+
+if [[ -z "$MCP_API_KEY" || "$MCP_API_KEY" == "log"* || "$MCP_API_KEY" == "ERROR"* ]]; then
+    error "❌ Chave API HTTP inválida ou não definida!"
+    exit 1  
+fi
+
 log "🔍 Verificando configurações antes de salvar:"
-log "   Token: ${LETSCLOUD_API_TOKEN:0:10}..."
-log "   API Key: ${MCP_API_KEY:0:10}..."
+log "   Token: ${LETSCLOUD_API_TOKEN:0:15}... (${#LETSCLOUD_API_TOKEN} chars)"
+log "   API Key: ${MCP_API_KEY:0:15}... (${#MCP_API_KEY} chars)"
 log "   Porta: $SERVER_PORT"
 
 sudo -u mcpserver tee "$MCP_HOME/.env" > /dev/null << EOF
