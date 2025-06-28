@@ -139,11 +139,19 @@ sudo apt update && sudo apt upgrade -y
 
 # Instalar dependências básicas
 log "🔧 Instalando dependências..."
+
+# Auto-detectar versão do Python
+PYTHON_VERSION=$(python3 --version 2>&1 | grep -oP '3\.\d+' | head -1)
+if [[ -z "$PYTHON_VERSION" ]]; then
+    PYTHON_VERSION="3.10"  # Fallback
+fi
+log "🐍 Python $PYTHON_VERSION detectado"
+
 sudo apt install -y \
-    python3.11 \
-    python3.11-pip \
-    python3.11-venv \
-    python3.11-dev \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
     git \
     nginx \
     certbot \
@@ -186,7 +194,7 @@ cd "$PROJECT_DIR"
 
 # Criar ambiente virtual
 if [[ ! -d "venv" ]]; then
-    sudo -u mcpserver python3.11 -m venv venv
+    sudo -u mcpserver python3 -m venv venv
 fi
 
 # Ativar venv e instalar dependências
