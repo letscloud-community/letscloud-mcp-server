@@ -47,13 +47,13 @@ Este é o índice completo da documentação do projeto LetsCloud MCP Server. Es
 
 **English:**
 - Download Claude Desktop
-- Install with: `pip install git+https://github.com/letscloud/letscloud-mcp-server.git`
+- Install with: `pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git`
 - Add to Claude Desktop config
 - Start talking to AI!
 
 **Português:**
 - Baixe o Claude Desktop
-- Instale com: `pip install git+https://github.com/letscloud/letscloud-mcp-server.git`
+- Instale com: `pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git`
 - Adicione à configuração do Claude Desktop
 - Comece a conversar com a IA!
 
@@ -62,13 +62,13 @@ Este é o índice completo da documentação do projeto LetsCloud MCP Server. Es
 **English:**
 ```bash
 # Create VM and run:
-curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 **Português:**
 ```bash
 # Crie uma VM e execute:
-curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 ---
@@ -133,8 +133,8 @@ IA: "Criando snapshot do servidor principal... Pronto! Backup salvo com seguran�
 
 ## 📞 **Support / Suporte**
 
-- **🐛 Issues:** [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
-- **💬 Discussions:** [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
+- **🐛 Issues:** [GitHub Issues](https://github.com/letscloud-community/letscloud-mcp-server/issues)
+- **💬 Discussions:** [GitHub Discussions](https://github.com/letscloud-community/letscloud-mcp-server/discussions)
 - **🌐 LetsCloud:** [support@letscloud.io](mailto:support@letscloud.io)
 
 ---

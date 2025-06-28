@@ -49,7 +49,7 @@ No programming. No technical commands. Just natural conversation in **English** 
 
 #### **3. Install the MCP Server**
 ```bash
-pip install git+https://github.com/letscloud/letscloud-mcp-server.git
+pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git
 ```
 
 ### **Option 2: Online Deployment (Recommended for Teams)** 🆕
@@ -57,7 +57,7 @@ pip install git+https://github.com/letscloud/letscloud-mcp-server.git
 #### **🌐 Deploy to Cloud in 1 Command**
 ```bash
 # Create VM and run:
-curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 **Result:** Your MCP server running 24/7 online, accessible from anywhere!
@@ -154,10 +154,10 @@ AI: "🚨 Emergency detected! Investigating immediately..."
 ### **Local Installation**
 ```bash
 # Option A: Install from GitHub (Recommended)
-pip install git+https://github.com/letscloud/letscloud-mcp-server.git
+pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git
 
 # Option B: Install from Source  
-git clone https://github.com/letscloud/letscloud-mcp-server.git
+git clone https://github.com/letscloud-community/letscloud-mcp-server.git
 cd letscloud-mcp-server
 pip install -e .
 
@@ -168,7 +168,7 @@ pip install letscloud-mcp-server
 ### **Online Deployment** 🆕
 ```bash
 # One-command cloud deployment
-curl -fsSL https://raw.githubusercontent.com/letscloud/letscloud-mcp-server/main/scripts/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 **📚 Complete Deployment Documentation:**
@@ -208,8 +208,8 @@ The AI assistants will automatically detect your language and respond appropriat
 
 ## 📞 Support & Community
 
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
-- **💬 Questions**: [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
+- **🐛 Bug Reports**: [GitHub Issues](https://github.com/letscloud-community/letscloud-mcp-server/issues)
+- **💬 Questions**: [GitHub Discussions](https://github.com/letscloud-community/letscloud-mcp-server/discussions)
 - **🌐 LetsCloud Support**: [support@letscloud.io](mailto:support@letscloud.io)
 - **🌍 Multi-language**: English and Portuguese support available
 

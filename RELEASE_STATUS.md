@@ -24,7 +24,7 @@
 ### **🏠 Modo Local (Desktop)**
 - **Status:** ✅ Produção Ready
 - **Cliente:** Claude Desktop, Cline, Zed
-- **Instalação:** `pip install git+https://github.com/letscloud/letscloud-mcp-server.git`
+- **Instalação:** `pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git`
 - **Configuração:** Arquivo JSON simples
 - **Uso:** Ideal para desenvolvedores individuais
 

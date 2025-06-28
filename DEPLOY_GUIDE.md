@@ -67,7 +67,7 @@ usermod -aG sudo mcpserver
 su - mcpserver
 
 # Clonar repositório
-git clone https://github.com/letscloud/letscloud-mcp-server.git
+git clone https://github.com/letscloud-community/letscloud-mcp-server.git
 cd letscloud-mcp-server
 
 # Criar ambiente virtual
@@ -452,8 +452,8 @@ Após seguir este guia, você terá:
 
 ## 📞 **Suporte**
 
-- **🐛 Issues:** [GitHub Issues](https://github.com/letscloud/letscloud-mcp-server/issues)
-- **💬 Discussões:** [GitHub Discussions](https://github.com/letscloud/letscloud-mcp-server/discussions)
+- **🐛 Issues:** [GitHub Issues](https://github.com/letscloud-community/letscloud-mcp-server/issues)
+- **💬 Discussões:** [GitHub Discussions](https://github.com/letscloud-community/letscloud-mcp-server/discussions)
 - **🌐 LetsCloud:** [support@letscloud.io](mailto:support@letscloud.io)
 
 ---
