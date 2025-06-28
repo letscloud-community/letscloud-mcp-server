@@ -86,8 +86,8 @@ if [[ $EUID -eq 0 ]]; then
         # Export variables for mcpserver user
         export LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
         
-        # Copy script to /tmp with configurations
-        cat > /tmp/deploy_as_user.sh << 'SCRIPT_EOF'
+        # Copy script to /tmp with configurations (no quotes to allow interpolation)
+        cat > /tmp/deploy_as_user.sh << SCRIPT_EOF
 #!/bin/bash
 # Configurations passed from root script
 LETSCLOUD_API_TOKEN="$LETSCLOUD_API_TOKEN"
@@ -245,6 +245,13 @@ sudo -u mcpserver bash -c "
 
 # Create configuration file
 log "⚙️ Creating configuration file..."
+
+# Debug: check variables before saving
+log "🔍 Checking configurations before saving:"
+log "   Token: ${LETSCLOUD_API_TOKEN:0:10}..."
+log "   API Key: ${MCP_API_KEY:0:10}..."
+log "   Port: $SERVER_PORT"
+
 sudo -u mcpserver tee "$MCP_HOME/.env" > /dev/null << EOF
 # LetsCloud MCP Server Configuration
 LETSCLOUD_API_TOKEN=$LETSCLOUD_API_TOKEN
@@ -260,6 +267,8 @@ MAX_CONNECTIONS=100
 
 # Generated on $(date)
 EOF
+
+log "✅ Configuration file created at $MCP_HOME/.env"
 
 # Create startup script
 log "📝 Creating startup script..."
@@ -493,6 +502,14 @@ echo
 SERVER_PORT=${SERVER_PORT:-8000}
 MCP_API_KEY=${MCP_API_KEY:-"ERROR-KEY-NOT-CONFIGURED"}
 LETSCLOUD_API_TOKEN=${LETSCLOUD_API_TOKEN:-"ERROR-TOKEN-NOT-CONFIGURED"}
+
+# Debug: check if variables are properly defined
+if [[ "$MCP_API_KEY" == "ERROR-KEY-NOT-CONFIGURED" ]]; then
+    warn "⚠️ API Key was not configured correctly!"
+    log "🔄 Generating new API key..."
+    MCP_API_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 32)
+    log "🔐 New API key generated: $MCP_API_KEY"
+fi
 
 # Get public IP
 PUBLIC_IP=$(curl -s ifconfig.me || echo "localhost")
