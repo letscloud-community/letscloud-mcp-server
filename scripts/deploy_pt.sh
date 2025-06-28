@@ -57,6 +57,7 @@ get_input() {
     local prompt="$1"
     local var_name="$2"
     local default="$3"
+    local allow_empty="$4"  # Novo parâmetro para permitir vazio
     
     if [[ -n "$default" ]]; then
         read -p "$prompt [$default]: " input
@@ -65,9 +66,12 @@ get_input() {
         fi
     else
         read -p "$prompt: " input
-        while [[ -z "$input" ]]; do
-            read -p "$prompt (obrigatório): " input
-        done
+        # Se allow_empty for "true", não forçar input
+        if [[ "$allow_empty" != "true" ]]; then
+            while [[ -z "$input" ]]; do
+                read -p "$prompt (obrigatório): " input
+            done
+        fi
     fi
     
     eval "$var_name='$input'"
@@ -93,9 +97,9 @@ if [[ "$NEED_CONFIG" == "true" ]]; then
     unset LETSCLOUD_API_TOKEN MCP_API_KEY SERVER_PORT DOMAIN
 
     get_input "🔑 Token da API LetsCloud" "LETSCLOUD_API_TOKEN"
-    get_input "🔐 Chave da API HTTP (deixe vazio para gerar)" "MCP_API_KEY"
+    get_input "🔐 Chave da API HTTP (deixe vazio para gerar)" "MCP_API_KEY" "" "true"
     get_input "🌐 Porta do servidor" "SERVER_PORT" "8000"
-    get_input "🏠 Domínio (opcional, deixe vazio para usar IP)" "DOMAIN"
+    get_input "🏠 Domínio (opcional, deixe vazio para usar IP)" "DOMAIN" "" "true"
 
     # Gerar chave API se não fornecida
     if [[ -z "$MCP_API_KEY" ]]; then
