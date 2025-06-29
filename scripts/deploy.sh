@@ -227,7 +227,7 @@ User=root
 WorkingDirectory=$PROJECT_DIR/src
 Environment=PATH=$PROJECT_DIR/venv/bin
 Environment=PYTHONPATH=$PROJECT_DIR/src
-ExecStart=$PROJECT_DIR/venv/bin/python -m uvicorn letscloud_mcp_server.server:app --host 0.0.0.0 --port $SERVER_PORT
+ExecStart=$PROJECT_DIR/venv/bin/python -m uvicorn letscloud_mcp_server.http_server:app --host 0.0.0.0 --port $SERVER_PORT
 Restart=always
 RestartSec=10
 EnvironmentFile=$ENV_FILE
