@@ -224,9 +224,10 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=$PROJECT_DIR
+WorkingDirectory=$PROJECT_DIR/src
 Environment=PATH=$PROJECT_DIR/venv/bin
-ExecStart=$PROJECT_DIR/venv/bin/python -m uvicorn server:app --host 0.0.0.0 --port $SERVER_PORT
+Environment=PYTHONPATH=$PROJECT_DIR/src
+ExecStart=$PROJECT_DIR/venv/bin/python -m uvicorn letscloud_mcp_server.server:app --host 0.0.0.0 --port $SERVER_PORT
 Restart=always
 RestartSec=10
 EnvironmentFile=$ENV_FILE
