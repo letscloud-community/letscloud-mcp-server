@@ -10,21 +10,21 @@
 
 ### **2. Run Deploy Script**
 ```bash
-# SSH into VM and execute (can run as root):
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+# SSH into VM and execute as root:
+sudo curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
-**💡 Tip:** If running as root, the script will offer to automatically create a non-root user and continue the installation!
+**💡 New:** Simplified script runs 100% as root - no user creation!
 
 ## 🎯 **What the script does automatically:**
 
 ✅ **System:** Updates Ubuntu and installs dependencies  
-✅ **Python:** Configures Python 3.11 + virtual environment  
-✅ **Project:** Clones repository and installs dependencies  
-✅ **Configuration:** Creates .env files and scripts  
-✅ **Services:** Configures systemd + nginx + SSL  
-✅ **Security:** Firewall + rate limiting + headers  
-✅ **Monitoring:** Automatic health checks  
+✅ **Python:** Detects Python version + virtual environment  
+✅ **Project:** Clones repository to `/opt/letscloud-mcp`  
+✅ **Configuration:** Creates .env files and service  
+✅ **Services:** Configures systemd service as root  
+✅ **Security:** Firewall + credential validation  
+✅ **Monitoring:** Integrated health checks  
 
 ## 📝 **Information Required:**
 
@@ -50,19 +50,22 @@ After 5-10 minutes you'll have:
 
 ```bash
 # View status
-sudo systemctl status letscloud-mcp
+systemctl status letscloud-mcp
 
 # View logs in real-time  
-sudo journalctl -u letscloud-mcp -f
+journalctl -u letscloud-mcp -f
 
 # Restart service
-sudo systemctl restart letscloud-mcp
+systemctl restart letscloud-mcp
 
 # Test health
 curl http://localhost:8000/health
 
 # List tools (with API key)
 curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:8000/tools
+
+# View configuration
+cat /opt/letscloud-mcp/.env
 ```
 
 ## 🚀 **Use with AI Client:**
@@ -98,23 +101,24 @@ print(response.json())
 
 - **Save the API Key** shown at the end of deployment
 - **Configure DNS** if using custom domain  
-- **Open ports 80/443** in provider firewall if necessary
-- **Regular backup** of `/home/mcpserver/.env` file
+- **Open specified port** in provider firewall  
+- **Regular backup** of `/opt/letscloud-mcp/.env` file
+- **Root execution** - simplified configuration
 
 ## 🆘 **Troubleshooting:**
 
 ```bash
 # Service won't start?
-sudo journalctl -u letscloud-mcp --no-pager
+journalctl -u letscloud-mcp --no-pager
 
-# Nginx errors?
-sudo nginx -t && sudo systemctl status nginx
+# Check configuration?
+cat /opt/letscloud-mcp/.env
 
 # Python issues?
-sudo -u mcpserver /home/mcpserver/letscloud-mcp-server/venv/bin/python -c "import letscloud_mcp_server; print('OK')"
+cd /opt/letscloud-mcp/letscloud-mcp-server && source venv/bin/activate && python -c "import letscloud_mcp_server; print('OK')"
 
 # Complete redeploy?
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+sudo curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 ---

@@ -56,11 +56,12 @@ pip install git+https://github.com/letscloud-community/letscloud-mcp-server.git
 
 #### **🌐 Deploy to Cloud in 1 Command**
 ```bash
-# Create VM and run:
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+# Create VM and run as root:
+sudo curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 **Result:** Your MCP server running 24/7 online, accessible from anywhere!
+**New:** Simplified deployment running 100% as root - no user creation!
 
 📚 **Complete Guides:**
 - **📖 [Complete Deployment Guide](DEPLOY_GUIDE_EN.md)** - Step-by-step deployment
@@ -167,8 +168,8 @@ pip install letscloud-mcp-server
 
 ### **Online Deployment** 🆕
 ```bash
-# One-command cloud deployment
-curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
+# One-command cloud deployment (as root)
+sudo curl -fsSL https://raw.githubusercontent.com/letscloud-community/letscloud-mcp-server/refs/heads/main/scripts/deploy.sh | bash
 ```
 
 **📚 Complete Deployment Documentation:**
